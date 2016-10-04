@@ -33,13 +33,19 @@ type CollectorConfig struct {
   Debug         bool
 }
 
-// DefaultCollectorConfig is the default configuration
-var DefaultCollectorConfig = &CollectorConfig{
+// defaultCollectorConfig is the default configuration
+var defaultCollectorConfig = &CollectorConfig{
   250 * time.Millisecond,
   1000,
   5 * time.Second,
   Endpoint,
   false,
+}
+
+// NewCollectorConfig returns a new default collector config
+func NewCollectorConfig() *CollectorConfig {
+  c := *defaultCollectorConfig
+  return &c
 }
 
 type collectRequest struct {
@@ -69,7 +75,7 @@ type Collector struct {
 // NewCollector returns a new collector
 func NewCollector(apiKey string, config *CollectorConfig) *Collector {
   if config == nil {
-    config = DefaultCollectorConfig
+    config = defaultCollectorConfig
   }
 
   c := &Collector{
@@ -97,19 +103,20 @@ func (c *Collector) makeRequest(events map[string][]map[string]interface{}) erro
     "api_key":  c.apiKey,
     "endpoint": c.config.Endpoint,
     "module":   "collector",
-    "method":   "makeRequest",
+    "function": "makeRequest",
   })
 
-  b, _ := json.Marshal(events)
-
-  url := c.config.Endpoint + "/collect"
-  req, err := http.NewRequest("POST", url, bytes.NewReader(b))
+  b, err := json.Marshal(events)
   if err != nil {
-    lg.WithError(err).Error("Request to Stride API failed")
-    return ErrRequestFailed
+    lg.WithError(err).Error("Failed to JSONify request body")
+    return ErrInvalidBody
   }
 
+  url := c.config.Endpoint + "/collect"
+  req, _ := http.NewRequest("POST", url, bytes.NewReader(b))
+
   req.Header.Add("User-Agent", fmt.Sprintf("gostride (version: %s)", Version))
+  req.Header.Add("Accept", "application/json")
   req.Header.Add("Content-Type", "application/json")
   req.Header.Add("Content-Length", fmt.Sprintf("%d", len(b)))
   req.SetBasicAuth(c.apiKey, "")
@@ -126,7 +133,7 @@ func (c *Collector) makeRequest(events map[string][]map[string]interface{}) erro
   }
 
   lg.WithField("status_code", res.StatusCode).Error("Stride API returned invalid status code")
-  return ErrServerError
+  return errorFromStatusCode(res.StatusCode)
 }
 
 func (c *Collector) start() error {

@@ -55,15 +55,10 @@ func (suite *SubscriptionTestSuite) TestSubscription() {
   e, addr := createMockSubscribeServer(stop, 25*time.Millisecond)
   defer e.Stop()
 
-  config := &SubscriptionConfig{
-    5 * time.Second,
-    time.Second,
-    300 * time.Second,
-    fmt.Sprintf("http://%s", addr),
-  }
+  config := NewConfig()
+  config.Endpoint = fmt.Sprintf("http://%s", addr)
 
-  s, err := NewSubscription("key", "collect/stream", config)
-  assert.Nil(suite.T(), err)
+  s := newSubscription("key", "collect/stream", config)
 
   s.Start()
   assert.True(suite.T(), s.IsRunning())
@@ -85,7 +80,7 @@ func (suite *SubscriptionTestSuite) TestSubscription() {
   close(stop)
   assert.True(suite.T(), atomic.LoadInt32(&count) <= 10)
 
-  err = s.Stop()
+  err := s.Stop()
   assert.Nil(suite.T(), err)
   assert.False(suite.T(), s.IsRunning())
 }

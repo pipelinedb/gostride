@@ -22,7 +22,7 @@ type mockRequest struct {
   body map[string]interface{}
 }
 
-func createMockServer() (*httptest.Server, chan mockRequest) {
+func createMockCollectServer() (*httptest.Server, chan mockRequest) {
   rchan := make(chan mockRequest, 1)
 
   server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
@@ -49,7 +49,7 @@ func (suite *CollectorTestSuite) TestEventFuncs() {
 }
 
 func (suite *CollectorTestSuite) TestCollector() {
-  server, rchan := createMockServer()
+  server, rchan := createMockCollectServer()
   defer server.Close()
 
   config := &CollectorConfig{

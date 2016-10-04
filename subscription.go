@@ -4,12 +4,9 @@ import (
   "bufio"
   "bytes"
   "encoding/json"
-  "errors"
   "fmt"
   "io"
   "net/http"
-  "regexp"
-  "strings"
   "time"
 
   "github.com/Sirupsen/logrus"
@@ -20,49 +17,20 @@ import (
 
 const delimiter = "\r\n"
 
-var validSubscriptionPaths = regexp.MustCompile(`^(collect|process)/[A-Za-z][A-Za-z0-9_]*$`)
-
-var (
-  // ErrInvalidEndpoint is returned when the subscription endpoint is not valid
-  ErrInvalidEndpoint = errors.New("invalid endpoint")
-)
-
-// SubscriptionConfig is the config for a subscrption
-type SubscriptionConfig struct {
-  Timeout         time.Duration
-  InitialInterval time.Duration
-  MaxInterval     time.Duration
-  Endpoint        string
-}
-
-// DefaultSubscriptionConfig is the default configuration
-var DefaultSubscriptionConfig = &SubscriptionConfig{
-  5 * time.Second,
-  time.Second,
-  300 * time.Second,
-  Endpoint,
-}
-
 // Subscription is a utility that exposes /subscribe endpoints
 type Subscription struct {
   apiKey string
   path   string
   client *http.Client
-  config *SubscriptionConfig
+  config *Config
   tomb   tomb.Tomb
 
   Events chan map[string]interface{}
 }
 
-// NewSubscription returns a new Subscription instance
-func NewSubscription(apiKey, path string, config *SubscriptionConfig) (*Subscription, error) {
-  path = strings.TrimRight(path, "/")
-  if !validSubscriptionPaths.MatchString(path) {
-    return nil, ErrInvalidEndpoint
-  }
-
+func newSubscription(apiKey, path string, config *Config) *Subscription {
   if config == nil {
-    config = DefaultSubscriptionConfig
+    config = defaultConfig
   }
 
   return &Subscription{
@@ -74,7 +42,7 @@ func NewSubscription(apiKey, path string, config *SubscriptionConfig) (*Subscrip
     config,
     tomb.Tomb{},
     make(chan map[string]interface{}),
-  }, nil
+  }
 }
 
 // Start listening for events async
@@ -86,20 +54,21 @@ func (s *Subscription) start() error {
   url := fmt.Sprintf("%s/%s", s.config.Endpoint, s.path)
 
   lg := log.WithFields(logrus.Fields{
-    "api_key": s.apiKey,
-    "url":     url,
-    "module":  "subscrption",
-    "method":  "Start",
+    "api_key":  s.apiKey,
+    "url":      url,
+    "module":   "subscrption",
+    "function": "Start",
   })
 
   b := backoff.NewExponentialBackOff()
-  b.InitialInterval = s.config.InitialInterval
+  b.InitialInterval = s.config.Subscription.InitialInterval
   b.Multiplier = 2
-  b.MaxInterval = s.config.MaxInterval
+  b.MaxInterval = s.config.Subscription.MaxInterval
   b.Reset()
 
   req, _ := http.NewRequest("GET", url, nil)
   req.Header.Add("User-Agent", fmt.Sprintf("gostride (version: %s)", Version))
+  req.Header.Add("Accept", "application/json")
   req.Header.Add("Content-Type", "application/json")
   req.SetBasicAuth(s.apiKey, "")
 
@@ -162,9 +131,9 @@ func scanLines(data []byte, atEOF bool) (advance int, token []byte, err error) {
 
 func (s *Subscription) receive(body io.ReadCloser) {
   lg := log.WithFields(logrus.Fields{
-    "api_key": s.apiKey,
-    "module":  "subscrption",
-    "method":  "receive",
+    "api_key":  s.apiKey,
+    "module":   "subscrption",
+    "function": "receive",
   })
 
   scanner := bufio.NewScanner(body)
