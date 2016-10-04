@@ -4,6 +4,7 @@ import (
   "fmt"
   "net"
   "net/http"
+  "sync/atomic"
   "testing"
   "time"
 
@@ -67,20 +68,22 @@ func (suite *SubscriptionTestSuite) TestSubscription() {
   s.Start()
   assert.True(suite.T(), s.IsRunning())
 
-  count := 0
+  var count int32
+  atomic.StoreInt32(&count, 0)
+  t := suite.T()
   go func() {
-    for e := range s.Events {
-      count++
-      assert.Equal(suite.T(), "cartman", e["user"])
-      assert.Equal(suite.T(), "2016-10-03T22:19:51Z", e["ts"])
+    for event := range s.Events {
+      atomic.AddInt32(&count, 1)
+      assert.Equal(t, "cartman", event["user"])
+      assert.Equal(t, "2016-10-03T22:19:51Z", event["ts"])
     }
   }()
 
   time.Sleep(250 * time.Millisecond)
 
-  assert.True(suite.T(), count <= 10)
+  assert.True(suite.T(), atomic.LoadInt32(&count) <= 10)
   close(stop)
-  assert.True(suite.T(), count <= 10)
+  assert.True(suite.T(), atomic.LoadInt32(&count) <= 10)
 
   err = s.Stop()
   assert.Nil(suite.T(), err)
