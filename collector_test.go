@@ -13,7 +13,7 @@ import (
   "github.com/stretchr/testify/suite"
 )
 
-type StrideTestSuite struct {
+type CollectorTestSuite struct {
   suite.Suite
 }
 
@@ -37,7 +37,7 @@ func createMockServer() (*httptest.Server, chan mockRequest) {
   return server, rchan
 }
 
-func (suite *StrideTestSuite) TestEventFuncs() {
+func (suite *CollectorTestSuite) TestEventFuncs() {
   event := make(map[string]interface{})
   location, _ := time.LoadLocation("America/New_York")
 
@@ -48,11 +48,11 @@ func (suite *StrideTestSuite) TestEventFuncs() {
   assert.Equal(suite.T(), "2016-09-12T09:00:00-04:00", event[Timestamp])
 }
 
-func (suite *StrideTestSuite) TestCollector() {
+func (suite *CollectorTestSuite) TestCollector() {
   server, rchan := createMockServer()
   defer server.Close()
 
-  config := &Config{
+  config := &CollectorConfig{
     FlushInterval: 250 * time.Millisecond,
     BatchSize:     10,
     Endpoint:      server.URL,
@@ -98,6 +98,6 @@ func (suite *StrideTestSuite) TestCollector() {
   }, request.body)
 }
 
-func TestStrideTestSuite(t *testing.T) {
-  suite.Run(t, new(StrideTestSuite))
+func TestCollectorTestSuite(t *testing.T) {
+  suite.Run(t, new(CollectorTestSuite))
 }

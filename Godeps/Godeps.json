@@ -9,6 +9,11 @@
 			"Rev": "3ec0642a7fb6488f65b06f9040adc67e3990296a"
 		},
 		{
+			"ImportPath": "github.com/cenkalti/backoff",
+			"Comment": "v1.0.0-14-g8edc80b",
+			"Rev": "8edc80b07f38c27352fb186d971c628a6c32552b"
+		},
+		{
 			"ImportPath": "github.com/davecgh/go-spew/spew",
 			"Comment": "v1.0.0",
 			"Rev": "6cf5744a041a0022271cefed95ba843f6d87fd51"
