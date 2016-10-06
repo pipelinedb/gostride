@@ -150,7 +150,7 @@ func NewStride(apiKey string, config *Config) *Stride {
   }
 }
 
-func (s *Stride) makeRequest(method, path string, data map[string]interface{}) *Response {
+func (s *Stride) makeRequest(method, path string, data interface{}) *Response {
   if !isPathValid(method, path) {
     return &Response{
       -1,
@@ -246,7 +246,7 @@ func (s *Stride) Get(path string) *Response {
 }
 
 // Post makes a POST request to the path
-func (s *Stride) Post(path string, data map[string]interface{}) *Response {
+func (s *Stride) Post(path string, data interface{}) *Response {
   return s.makeRequest(http.MethodPost, path, data)
 }
 
