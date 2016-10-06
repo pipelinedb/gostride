@@ -24,7 +24,7 @@ func createMockServer(t *testing.T) *httptest.Server {
     case http.MethodGet:
       w.WriteHeader(http.StatusOK)
 
-      if path == "//collect" {
+      if path == "/collect" {
         w.Write([]byte(`["stream0", "stream1"]`))
       }
     case http.MethodPost:
