@@ -24,6 +24,7 @@ func createMockSubscribeServer(stop chan bool, delay time.Duration) (*echo.Echo,
   e.GET("v1/collect/stream", func(c echo.Context) error {
     c.Response().Header().Set(echo.HeaderContentType, echo.MIMEApplicationJSONCharsetUTF8)
     c.Response().WriteHeader(http.StatusOK)
+    c.Response().(http.Flusher).Flush()
 
     for {
       c.Response().Write([]byte(`{"ts": "2016-10-03T22:19:51Z", "user": "cartman"}`))

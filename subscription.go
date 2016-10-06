@@ -36,9 +36,7 @@ func newSubscription(apiKey, path string, config *Config) *Subscription {
   return &Subscription{
     apiKey,
     path,
-    &http.Client{
-      Timeout: config.Timeout,
-    },
+    &http.Client{},
     config,
     tomb.Tomb{},
     make(chan map[string]interface{}),
@@ -87,13 +85,13 @@ func (s *Subscription) start() error {
       b.Reset()
     case 429, 500, 504:
       lg.WithField("status_code", resp.StatusCode).Error("Invalid status code")
-      wait = b.NextBackOff()
     case 404:
       return ErrResourceMissing
     default:
       return ErrServerError
     }
 
+    wait = b.NextBackOff()
     if wait == backoff.Stop {
       return ErrTimeout
     }
@@ -147,6 +145,7 @@ func (s *Subscription) receive(body io.ReadCloser) {
     }
 
     token := scanner.Bytes()
+
     if len(token) == 0 {
       // empty keep-alive
       continue
