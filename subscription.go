@@ -51,12 +51,12 @@ func (s *Subscription) Start() {
 }
 
 func (s *Subscription) start() error {
-  url := fmt.Sprintf("%s/%s", s.config.Endpoint, s.path)
+  url := s.config.Endpoint + s.path
 
   lg := log.WithFields(logrus.Fields{
     "api_key":  s.apiKey,
     "url":      url,
-    "module":   "subscrption",
+    "module":   "subscription",
     "function": "Start",
   })
 
@@ -132,7 +132,7 @@ func scanLines(data []byte, atEOF bool) (advance int, token []byte, err error) {
 func (s *Subscription) receive(body io.ReadCloser) {
   lg := log.WithFields(logrus.Fields{
     "api_key":  s.apiKey,
-    "module":   "subscrption",
+    "module":   "subscription",
     "function": "receive",
   })
 

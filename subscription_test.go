@@ -21,7 +21,7 @@ type SubscriptionTestSuite struct {
 func createMockSubscribeServer(stop chan bool, delay time.Duration) (*echo.Echo, string) {
   e := echo.New()
 
-  e.GET("/collect/stream", func(c echo.Context) error {
+  e.GET("v1/collect/stream", func(c echo.Context) error {
     c.Response().Header().Set(echo.HeaderContentType, echo.MIMEApplicationJSONCharsetUTF8)
     c.Response().WriteHeader(http.StatusOK)
 
@@ -56,9 +56,9 @@ func (suite *SubscriptionTestSuite) TestSubscription() {
   defer e.Stop()
 
   config := NewConfig()
-  config.Endpoint = fmt.Sprintf("http://%s", addr)
+  config.Endpoint = fmt.Sprintf("http://%s/v1", addr)
 
-  s := newSubscription("key", "collect/stream", config)
+  s := newSubscription("key", "/collect/stream", config)
 
   s.Start()
   assert.True(suite.T(), s.IsRunning())

@@ -24,7 +24,7 @@ func createMockServer(t *testing.T) *httptest.Server {
     case http.MethodGet:
       w.WriteHeader(http.StatusOK)
 
-      if path == "/collect" {
+      if path == "/v1/collect" {
         w.Write([]byte(`["stream0", "stream1"]`))
       }
     case http.MethodPost:
@@ -70,7 +70,7 @@ func (suite *StrideTestSuite) TestMethods() {
   server := createMockServer(suite.T())
 
   config := NewConfig()
-  config.Endpoint = server.URL
+  config.Endpoint = server.URL + "/v1"
 
   s := NewStride("key", config)
 
