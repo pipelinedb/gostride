@@ -167,7 +167,7 @@ func (s *Stride) makeRequest(method, path string, data interface{}) *Response {
     "function": "makeRequest",
   })
 
-  url := fmt.Sprintf("%s/%s", s.config.Endpoint, path)
+  url := s.config.Endpoint + path
   var reader io.Reader
   var body []byte
   if data != nil {
