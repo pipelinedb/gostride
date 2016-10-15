@@ -58,12 +58,19 @@ func (suite *StrideTestSuite) TestPathValidation() {
   assert.True(suite.T(), isPathValid(http.MethodPost, "/analyze/query"))
   assert.True(suite.T(), isPathValid(http.MethodDelete, "/analyze/query"))
   assert.True(suite.T(), isPathValid(http.MethodGet, "/analyze/query/results"))
+  assert.True(suite.T(), isPathValid(http.MethodGet, "/analyze/query/results"))
+  assert.True(suite.T(), isPathValid(http.MethodPut, "/analyze/query"))
 
   assert.False(suite.T(), isPathValid(http.MethodGet, "/collect/_stream"))
   assert.False(suite.T(), isPathValid(http.MethodGet, "/collect/1stream"))
   assert.False(suite.T(), isPathValid(http.MethodGet, "/collect/stream/results"))
   assert.False(suite.T(), isPathValid(http.MethodPost, "/process"))
   assert.False(suite.T(), isPathValid("Subscribe", "/analyze/query/subscribe"))
+  assert.False(suite.T(), isPathValid(http.MethodPut, "/collect/stream"))
+  assert.False(suite.T(), isPathValid(http.MethodPut, "/process/proc"))
+  assert.False(suite.T(), isPathValid(http.MethodPut, "/collect"))
+  assert.False(suite.T(), isPathValid(http.MethodPut, "/process"))
+  assert.False(suite.T(), isPathValid(http.MethodPut, "/analyze"))
 }
 
 func (suite *StrideTestSuite) TestMethods() {
