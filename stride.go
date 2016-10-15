@@ -59,6 +59,7 @@ var validPaths = map[string][]*regexp.Regexp{
     regexp.MustCompile(`^/(collect|process|analyze)/[A-Za-z][A-Za-z0-9_]*$`),
     regexp.MustCompile(`^/(collect|analyze)$`),
   },
+  http.MethodPut:    []*regexp.Regexp{regexp.MustCompile(`^/analyze/[A-Za-z][A-Za-z0-9_]*$`)},
   http.MethodDelete: []*regexp.Regexp{regexp.MustCompile(`^/(collect|process|analyze)/[A-Za-z][A-Za-z0-9_]*$`)},
   "Subscribe":       []*regexp.Regexp{regexp.MustCompile(`^/(collect|process)/[A-Za-z][A-Za-z0-9_]*/subscribe$`)},
 }
@@ -248,6 +249,11 @@ func (s *Stride) Get(path string) *Response {
 // Post makes a POST request to the path
 func (s *Stride) Post(path string, data interface{}) *Response {
   return s.makeRequest(http.MethodPost, path, data)
+}
+
+// Put makes a PUT request to the path
+func (s *Stride) Put(path string, data interface{}) *Response {
+  return s.makeRequest(http.MethodPut, path, data)
 }
 
 // Delete makes a DELETE request to the path
