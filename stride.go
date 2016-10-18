@@ -206,16 +206,6 @@ func (s *Stride) makeRequest(method, path string, data interface{}) *Response {
   }
   defer res.Body.Close()
 
-  if res.StatusCode < 200 || res.StatusCode > 201 {
-    lg.WithField("status_code", res.StatusCode).Error("Stride API returned invalid status code")
-
-    return &Response{
-      res.StatusCode,
-      nil,
-      errorFromStatusCode(res.StatusCode),
-    }
-  }
-
   var v interface{}
 
   if res.Body != nil {
@@ -228,10 +218,20 @@ func (s *Stride) makeRequest(method, path string, data interface{}) *Response {
       lg.WithError(err).Error("Failed to read/parse response body")
 
       return &Response{
-        http.StatusOK,
+        res.StatusCode,
         nil,
         ErrInvalidResponse,
       }
+    }
+  }
+
+  if res.StatusCode < 200 || res.StatusCode > 201 {
+    lg.WithField("status_code", res.StatusCode).Error("Stride API returned invalid status code")
+
+    return &Response{
+      res.StatusCode,
+      v,
+      errorFromStatusCode(res.StatusCode),
     }
   }
 
