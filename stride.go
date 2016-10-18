@@ -58,6 +58,7 @@ var validPaths = map[string][]*regexp.Regexp{
   http.MethodPost: []*regexp.Regexp{
     regexp.MustCompile(`^/(collect|process|analyze)/[A-Za-z][A-Za-z0-9_]*$`),
     regexp.MustCompile(`^/(collect|analyze)$`),
+    regexp.MustCompile(`^/analyze/[A-Za-z][A-Za-z0-9_]*/results$`),
   },
   http.MethodPut:    []*regexp.Regexp{regexp.MustCompile(`^/analyze/[A-Za-z][A-Za-z0-9_]*$`)},
   http.MethodDelete: []*regexp.Regexp{regexp.MustCompile(`^/(collect|process|analyze)/[A-Za-z][A-Za-z0-9_]*$`)},
