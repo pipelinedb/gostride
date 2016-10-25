@@ -51,18 +51,18 @@ var (
 )
 
 var validPaths = map[string][]*regexp.Regexp{
-	http.MethodGet: []*regexp.Regexp{
+	http.MethodGet: {
 		regexp.MustCompile(`^/(collect|process)(/[A-Za-z][A-Za-z0-9_]*)?$`),
 		regexp.MustCompile(`^/analyze(/[A-Za-z][A-Za-z0-9_]*(/results)?)?$`),
 	},
-	http.MethodPost: []*regexp.Regexp{
+	http.MethodPost: {
 		regexp.MustCompile(`^/(collect|process|analyze)/[A-Za-z][A-Za-z0-9_]*$`),
 		regexp.MustCompile(`^/(collect|analyze)$`),
 		regexp.MustCompile(`^/analyze/[A-Za-z][A-Za-z0-9_]*/results$`),
 	},
-	http.MethodPut:    []*regexp.Regexp{regexp.MustCompile(`^/analyze/[A-Za-z][A-Za-z0-9_]*$`)},
-	http.MethodDelete: []*regexp.Regexp{regexp.MustCompile(`^/(collect|process|analyze)/[A-Za-z][A-Za-z0-9_]*$`)},
-	"Subscribe":       []*regexp.Regexp{regexp.MustCompile(`^/(collect|process)/[A-Za-z][A-Za-z0-9_]*$`)},
+	http.MethodPut:    {regexp.MustCompile(`^/analyze/[A-Za-z][A-Za-z0-9_]*$`)},
+	http.MethodDelete: {regexp.MustCompile(`^/(collect|process|analyze)/[A-Za-z][A-Za-z0-9_]*$`)},
+	"Subscribe":       {regexp.MustCompile(`^/(collect|process)/[A-Za-z][A-Za-z0-9_]*$`)},
 }
 
 func isPathValid(method, path string) bool {
