@@ -66,14 +66,12 @@ var validPaths = map[string][]*regexp.Regexp{
 }
 
 func isPathValid(method, path string) bool {
-  matched := false
   for _, re := range validPaths[method] {
     if re.MatchString(path) {
-      matched = true
-      break
+      return true
     }
   }
-  return matched
+  return false
 }
 
 func errorFromStatusCode(statusCode int) error {
