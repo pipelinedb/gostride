@@ -53,6 +53,7 @@ var (
 var validPaths = map[string][]*regexp.Regexp{
 	http.MethodGet: {
 		regexp.MustCompile(`^/(collect|process)(/[A-Za-z][A-Za-z0-9_]*)?$`),
+		regexp.MustCompile(`^/process(/[A-Za-z][A-Za-z0-9_]*(/stats)?)?$`),
 		regexp.MustCompile(`^/analyze(/[A-Za-z][A-Za-z0-9_]*(/results)?)?$`),
 	},
 	http.MethodPost: {
