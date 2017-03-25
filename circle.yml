@@ -1,0 +1,23 @@
+machine:
+  environment:
+      IMPORT_PATH: "github.com/$CIRCLE_PROJECT_USERNAME/$CIRCLE_PROJECT_REPONAME"
+
+checkout:
+  post:
+   - rm -rf ~/.go_workspace/src/$IMPORT_PATH
+   - mkdir -p ~/.go_workspace/src/$IMPORT_PATH
+   - cp -R ~/$CIRCLE_PROJECT_REPONAME ~/.go_workspace/src/github.com/$CIRCLE_PROJECT_USERNAME
+   - rm -rf ~/$CIRCLE_PROJECT_REPONAME
+   - ln -s ~/.go_workspace/src/$IMPORT_PATH ~/$CIRCLE_PROJECT_REPONAME
+
+dependencies:
+  pre:
+    - go get github.com/tools/godep
+
+  override:
+    - (cd ~/.go_workspace/src/$IMPORT_PATH/ && godep restore)
+    - go build
+
+test:
+  override:
+    - make test
