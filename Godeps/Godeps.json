@@ -1,66 +1,47 @@
 {
 	"ImportPath": "github.com/pipelinedb/gostride",
-	"GoVersion": "go1.7",
-	"GodepVersion": "v74",
+	"GoVersion": "go1.8",
+	"GodepVersion": "v79",
 	"Deps": [
 		{
 			"ImportPath": "github.com/Sirupsen/logrus",
-			"Comment": "v0.10.0-38-g3ec0642",
-			"Rev": "3ec0642a7fb6488f65b06f9040adc67e3990296a"
+			"Comment": "v0.11.5-12-g10f801e",
+			"Rev": "10f801ebc38b33738c9d17d50860f484a0988ff5"
 		},
 		{
 			"ImportPath": "github.com/cenkalti/backoff",
-			"Comment": "v1.0.0-14-g8edc80b",
-			"Rev": "8edc80b07f38c27352fb186d971c628a6c32552b"
+			"Comment": "v1.0.0-18-g3db60c8",
+			"Rev": "3db60c813733fce657c114634171689bbf1f8dee"
 		},
 		{
 			"ImportPath": "github.com/davecgh/go-spew/spew",
-			"Comment": "v1.0.0-3-g6d21280",
-			"Rev": "6d212800a42e8ab5c146b8ace3490ee17e5225f9"
+			"Comment": "v1.1.0",
+			"Rev": "346938d642f2ec3594ed81d874461961cd0faa76"
 		},
 		{
 			"ImportPath": "github.com/labstack/echo",
-			"Comment": "2.1-6-g1dcb7ba",
-			"Rev": "1dcb7ba9ab8030aeb23e6e4d893a3efe0dc3d7a7"
-		},
-		{
-			"ImportPath": "github.com/labstack/echo/context",
-			"Comment": "2.1-6-g1dcb7ba",
-			"Rev": "1dcb7ba9ab8030aeb23e6e4d893a3efe0dc3d7a7"
-		},
-		{
-			"ImportPath": "github.com/labstack/echo/engine",
-			"Comment": "2.1-6-g1dcb7ba",
-			"Rev": "1dcb7ba9ab8030aeb23e6e4d893a3efe0dc3d7a7"
-		},
-		{
-			"ImportPath": "github.com/labstack/echo/engine/standard",
-			"Comment": "2.1-6-g1dcb7ba",
-			"Rev": "1dcb7ba9ab8030aeb23e6e4d893a3efe0dc3d7a7"
-		},
-		{
-			"ImportPath": "github.com/labstack/echo/log",
-			"Comment": "2.1-6-g1dcb7ba",
-			"Rev": "1dcb7ba9ab8030aeb23e6e4d893a3efe0dc3d7a7"
+			"Comment": "v3.1.0-rc.1-25-g22012e0",
+			"Rev": "22012e0e9da962b1b6a67b9e009d8eabe35d2d7e"
 		},
 		{
 			"ImportPath": "github.com/labstack/gommon/color",
-			"Comment": "v0.0.3-64-gf3b1a1b",
-			"Rev": "f3b1a1b3bd4726161e1200863d278df7da5e66ff"
+			"Comment": "v0.2.0",
+			"Rev": "9cedb429ffbe71a32a3ae7c65fd109cb7ae07804"
 		},
 		{
 			"ImportPath": "github.com/labstack/gommon/log",
-			"Comment": "v0.0.3-64-gf3b1a1b",
-			"Rev": "f3b1a1b3bd4726161e1200863d278df7da5e66ff"
+			"Comment": "v0.2.0",
+			"Rev": "9cedb429ffbe71a32a3ae7c65fd109cb7ae07804"
 		},
 		{
 			"ImportPath": "github.com/mattn/go-colorable",
-			"Comment": "v0.0.6-6-g6c903ff",
-			"Rev": "6c903ff4aa50920ca86087a280590b36b3152b9c"
+			"Comment": "v0.0.7-24-gded68f7",
+			"Rev": "ded68f7a9561c023e790de24279db7ebf473ea80"
 		},
 		{
 			"ImportPath": "github.com/mattn/go-isatty",
-			"Rev": "66b8e73f3f5cda9f96b69efd03dd3d7fc4a5cdb8"
+			"Comment": "v0.0.1-32-gfc9e8d8",
+			"Rev": "fc9e8d8ef48496124e79ae0df75490096eccf6fe"
 		},
 		{
 			"ImportPath": "github.com/pmezard/go-difflib/difflib",
@@ -69,22 +50,42 @@
 		},
 		{
 			"ImportPath": "github.com/stretchr/testify/assert",
-			"Comment": "v1.1.4-4-g976c720",
-			"Rev": "976c720a22c8eb4eb6a0b4348ad85ad12491a506"
+			"Comment": "v1.1.4-27-g4d4bfba",
+			"Rev": "4d4bfba8f1d1027c4fdbe371823030df51419987"
 		},
 		{
 			"ImportPath": "github.com/stretchr/testify/require",
-			"Comment": "v1.1.4-4-g976c720",
-			"Rev": "976c720a22c8eb4eb6a0b4348ad85ad12491a506"
+			"Comment": "v1.1.4-27-g4d4bfba",
+			"Rev": "4d4bfba8f1d1027c4fdbe371823030df51419987"
 		},
 		{
 			"ImportPath": "github.com/stretchr/testify/suite",
-			"Comment": "v1.1.4-4-g976c720",
-			"Rev": "976c720a22c8eb4eb6a0b4348ad85ad12491a506"
+			"Comment": "v1.1.4-27-g4d4bfba",
+			"Rev": "4d4bfba8f1d1027c4fdbe371823030df51419987"
+		},
+		{
+			"ImportPath": "github.com/valyala/bytebufferpool",
+			"Rev": "e746df99fe4a3986f4d4f79e13c1e0117ce9c2f7"
 		},
 		{
 			"ImportPath": "github.com/valyala/fasttemplate",
-			"Rev": "3b874956e03f1636d171bda64b130f9135f42cff"
+			"Rev": "dcecefd839c4193db0d35b88ec65b4c12d360ab0"
+		},
+		{
+			"ImportPath": "golang.org/x/crypto/acme",
+			"Rev": "f6b343c37ca80bfa8ea539da67a0b621f84fab1d"
+		},
+		{
+			"ImportPath": "golang.org/x/crypto/acme/autocert",
+			"Rev": "f6b343c37ca80bfa8ea539da67a0b621f84fab1d"
+		},
+		{
+			"ImportPath": "golang.org/x/net/context",
+			"Rev": "3bafa3320efdf0c95d056586aa9abdd05ad72ee1"
+		},
+		{
+			"ImportPath": "golang.org/x/net/context/ctxhttp",
+			"Rev": "3bafa3320efdf0c95d056586aa9abdd05ad72ee1"
 		},
 		{
 			"ImportPath": "golang.org/x/sys/unix",

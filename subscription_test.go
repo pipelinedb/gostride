@@ -1,6 +1,7 @@
 package stride
 
 import (
+	"context"
 	"fmt"
 	"net"
 	"net/http"
@@ -9,7 +10,6 @@ import (
 	"time"
 
 	"github.com/labstack/echo"
-	"github.com/labstack/echo/engine/standard"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/suite"
 )
@@ -24,12 +24,12 @@ func createMockSubscribeServer(stop chan bool, delay time.Duration) (*echo.Echo,
 	e.GET("v1/collect/stream/subscribe", func(c echo.Context) error {
 		c.Response().Header().Set(echo.HeaderContentType, echo.MIMEApplicationJSONCharsetUTF8)
 		c.Response().WriteHeader(http.StatusOK)
-		c.Response().(http.Flusher).Flush()
+		c.Response().Flush()
 
 		for {
 			c.Response().Write([]byte(`{"ts": "2016-10-03T22:19:51Z", "user": "cartman"}`))
 			c.Response().Write([]byte(delimiter))
-			c.Response().(http.Flusher).Flush()
+			c.Response().Flush()
 
 			select {
 			case <-stop:
@@ -44,7 +44,7 @@ func createMockSubscribeServer(stop chan bool, delay time.Duration) (*echo.Echo,
 	addr := l.Addr().String()
 	l.Close()
 
-	go func() { e.Run(standard.New(addr)) }()
+	go func() { e.Start(addr) }()
 	// Wait for server to boot up
 	time.Sleep(2 * time.Second)
 
@@ -54,7 +54,12 @@ func createMockSubscribeServer(stop chan bool, delay time.Duration) (*echo.Echo,
 func (suite *SubscriptionTestSuite) TestSubscription() {
 	stop := make(chan bool)
 	e, addr := createMockSubscribeServer(stop, 25*time.Millisecond)
-	defer e.Stop()
+
+	defer func() {
+		cxt, cancel := context.WithTimeout(context.Background(), 2*time.Second)
+		defer cancel()
+		e.Shutdown(cxt)
+	}()
 
 	config := NewConfig()
 	config.Endpoint = fmt.Sprintf("http://%s/v1", addr)
