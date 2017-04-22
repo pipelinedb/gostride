@@ -161,7 +161,6 @@ func (s *Stride) makeRequest(method, path string, data interface{}) *Response {
 	}
 
 	lg := log.WithFields(logrus.Fields{
-		"api_key":  s.apiKey,
 		"endpoint": s.config.Endpoint,
 		"module":   "stride",
 		"method":   method,

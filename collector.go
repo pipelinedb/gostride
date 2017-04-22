@@ -100,7 +100,6 @@ func NewCollector(apiKey string, config *CollectorConfig) *Collector {
 
 func (c *Collector) makeRequest(events map[string][]map[string]interface{}) error {
 	lg := log.WithFields(logrus.Fields{
-		"api_key":  c.apiKey,
 		"endpoint": c.config.Endpoint,
 		"module":   "collector",
 		"function": "makeRequest",
@@ -138,7 +137,6 @@ func (c *Collector) makeRequest(events map[string][]map[string]interface{}) erro
 
 func (c *Collector) start() error {
 	lg := log.WithFields(logrus.Fields{
-		"api_key":  c.apiKey,
 		"endpoint": c.config.Endpoint,
 		"module":   "collector",
 	})
