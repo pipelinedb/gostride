@@ -19,13 +19,13 @@ const delimiter = "\r\n"
 
 // Subscription is a utility that exposes /subscribe endpoints
 type Subscription struct {
-	apiKey string
-	path   string
-	client *http.Client
-	config *Config
-	tomb   tomb.Tomb
-
-	Events chan map[string]interface{}
+	apiKey    string
+	path      string
+	client    *http.Client
+	config    *Config
+	tomb      tomb.Tomb
+	connected bool
+	Events    chan map[string]interface{}
 }
 
 func newSubscription(apiKey, path string, config *Config) *Subscription {
@@ -39,6 +39,7 @@ func newSubscription(apiKey, path string, config *Config) *Subscription {
 		&http.Client{},
 		config,
 		tomb.Tomb{},
+		false,
 		make(chan map[string]interface{}),
 	}
 }
@@ -80,7 +81,10 @@ func (s *Subscription) start() error {
 
 		switch resp.StatusCode {
 		case 200:
+			// active = true
+			s.connected = true
 			s.receive(resp.Body)
+			s.connected = false
 			b.Reset()
 		case 429, 500, 504:
 			lg.WithField("status_code", resp.StatusCode).Error("Invalid status code")
@@ -139,7 +143,6 @@ func (s *Subscription) receive(body io.ReadCloser) {
 	exited := false
 
 	go func() {
-		// the http connection underlying this scanner has been closed
 		for scanner.Scan() {
 			tokenCh <- scanner.Bytes()
 		}
@@ -182,7 +185,12 @@ func (s *Subscription) receive(body io.ReadCloser) {
 	}
 }
 
-// IsRunning returns whether the subscription is still active
+// IsConnected returns whether this Subscription is connected to its endpoint
+func (s *Subscription) IsConnected() bool {
+	return s.connected
+}
+
+// IsRunning returns whether the Subscription is still active
 func (s *Subscription) IsRunning() bool {
 	return s.tomb.Alive()
 }

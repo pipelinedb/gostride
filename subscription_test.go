@@ -40,7 +40,10 @@ func createMockSubscribeServer(stop chan bool, delay time.Duration, count int) (
 			}
 		}
 
-		return nil
+		// Stay running, the client will determine when to close the connection
+		for {
+			time.Sleep(1 * time.Second)
+		}
 	})
 
 	l, _ := net.Listen("tcp", "localhost:0")
@@ -88,12 +91,14 @@ func (suite *SubscriptionTestSuite) TestSubscription() {
 		time.Sleep(100 * time.Millisecond)
 	}
 
+	assert.True(suite.T(), s.IsConnected())
 	assert.Equal(suite.T(), int32(10000), atomic.LoadInt32(&count))
 	close(stop)
 	assert.Equal(suite.T(), int32(10000), atomic.LoadInt32(&count))
 
 	err := s.Stop()
 	assert.Nil(suite.T(), err)
+	assert.False(suite.T(), s.IsConnected())
 	assert.False(suite.T(), s.IsRunning())
 }
 
