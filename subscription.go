@@ -136,14 +136,18 @@ func (s *Subscription) receive(body io.ReadCloser) {
 	scanner.Split(scanLines)
 
 	tokenCh := make(chan []byte)
+	exited := false
+
 	go func() {
+		// the http connection underlying this scanner has been closed
 		for scanner.Scan() {
 			tokenCh <- scanner.Bytes()
 		}
-		if scanner.Err() != nil {
+		// Don't log any connection errors thrown as a result of this Subscription's
+		// underlying connection being purposely closed
+		if !exited && scanner.Err() != nil {
 			lg.WithError(scanner.Err()).Error("Error reading data")
 		}
-		// Main loop will restart us
 		close(tokenCh)
 	}()
 
@@ -168,9 +172,11 @@ func (s *Subscription) receive(body io.ReadCloser) {
 			case s.Events <- event:
 				written++
 			case <-s.tomb.Dying():
+				exited = true
 				return
 			}
 		case <-s.tomb.Dying():
+			exited = true
 			return
 		}
 	}
