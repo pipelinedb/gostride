@@ -18,18 +18,20 @@ type SubscriptionTestSuite struct {
 	suite.Suite
 }
 
-func createMockSubscribeServer(stop chan bool, delay time.Duration) (*echo.Echo, string) {
+func createMockSubscribeServer(stop chan bool, delay time.Duration, count int) (*echo.Echo, string) {
 	e := echo.New()
 
+	written := 0
 	e.GET("v1/collect/stream/subscribe", func(c echo.Context) error {
 		c.Response().Header().Set(echo.HeaderContentType, echo.MIMEApplicationJSONCharsetUTF8)
 		c.Response().WriteHeader(http.StatusOK)
 		c.Response().Flush()
 
-		for {
+		for written < count {
 			c.Response().Write([]byte(`{"ts": "2016-10-03T22:19:51Z", "user": "cartman"}`))
 			c.Response().Write([]byte(delimiter))
 			c.Response().Flush()
+			written++
 
 			select {
 			case <-stop:
@@ -38,6 +40,7 @@ func createMockSubscribeServer(stop chan bool, delay time.Duration) (*echo.Echo,
 			}
 		}
 
+		return nil
 	})
 
 	l, _ := net.Listen("tcp", "localhost:0")
@@ -53,7 +56,7 @@ func createMockSubscribeServer(stop chan bool, delay time.Duration) (*echo.Echo,
 
 func (suite *SubscriptionTestSuite) TestSubscription() {
 	stop := make(chan bool)
-	e, addr := createMockSubscribeServer(stop, 25*time.Millisecond)
+	e, addr := createMockSubscribeServer(stop, 1*time.Millisecond, 10000)
 
 	defer func() {
 		cxt, cancel := context.WithTimeout(context.Background(), 2*time.Second)
@@ -67,6 +70,7 @@ func (suite *SubscriptionTestSuite) TestSubscription() {
 	s := newSubscription("key", "/collect/stream", config)
 
 	s.Start()
+	start := time.Now()
 	assert.True(suite.T(), s.IsRunning())
 
 	var count int32
@@ -80,11 +84,13 @@ func (suite *SubscriptionTestSuite) TestSubscription() {
 		}
 	}()
 
-	time.Sleep(250 * time.Millisecond)
+	for atomic.LoadInt32(&count) < 10000 && time.Since(start) < 20*time.Second {
+		time.Sleep(100 * time.Millisecond)
+	}
 
-	assert.True(suite.T(), atomic.LoadInt32(&count) <= 10)
+	assert.Equal(suite.T(), int32(10000), atomic.LoadInt32(&count))
 	close(stop)
-	assert.True(suite.T(), atomic.LoadInt32(&count) <= 10)
+	assert.Equal(suite.T(), int32(10000), atomic.LoadInt32(&count))
 
 	err := s.Stop()
 	assert.Nil(suite.T(), err)

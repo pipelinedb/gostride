@@ -135,35 +135,44 @@ func (s *Subscription) receive(body io.ReadCloser) {
 	scanner := bufio.NewScanner(body)
 	scanner.Split(scanLines)
 
-	for scanner.Scan() {
+	tokenCh := make(chan []byte)
+	go func() {
+		for scanner.Scan() {
+			tokenCh <- scanner.Bytes()
+		}
+		if scanner.Err() != nil {
+			lg.WithError(scanner.Err()).Error("Error reading data")
+		}
+		// Main loop will restart us
+		close(tokenCh)
+	}()
+
+	written := 0
+	for {
 		select {
+		case token, open := <-tokenCh:
+			if !open {
+				return
+			}
+			if len(token) == 0 {
+				// Empty keep-alive
+				continue
+			}
+			var event map[string]interface{}
+			if err := json.Unmarshal(token, &event); err != nil {
+				lg.WithError(err).Error("Failed to parse incoming event")
+				continue
+			}
+			// Now send the event to the Subscription receiver
+			select {
+			case s.Events <- event:
+				written++
+			case <-s.tomb.Dying():
+				return
+			}
 		case <-s.tomb.Dying():
 			return
-		default:
 		}
-
-		token := scanner.Bytes()
-
-		if len(token) == 0 {
-			// empty keep-alive
-			continue
-		}
-
-		var event map[string]interface{}
-		if err := json.Unmarshal(token, &event); err != nil {
-			lg.WithError(err).Error("Failed to parse incoming event")
-			continue
-		}
-
-		select {
-		case s.Events <- event:
-		case <-s.tomb.Dying():
-			return
-		}
-	}
-
-	if scanner.Err() != nil {
-		lg.WithError(scanner.Err()).Error("Error reading data")
 	}
 }
 
