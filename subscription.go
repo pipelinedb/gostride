@@ -81,7 +81,6 @@ func (s *Subscription) start() error {
 
 		switch resp.StatusCode {
 		case 200:
-			// active = true
 			s.connected = true
 			s.receive(resp.Body)
 			s.connected = false
