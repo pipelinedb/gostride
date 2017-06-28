@@ -20,7 +20,7 @@ To use `gostride` in your Go project, create a new instance of the `Stride` type
 ```go
 
 conf := NewConfig()
-stride := NewStride("your_api_key", conf)
+stride := NewStride("your_secret_key", conf)
 ```
 
 `Stride` is a thin wrapper around [Stride's HTTP API](https://www.stride.io/docs), so there are only a few main methods
@@ -131,7 +131,7 @@ config := &CollectorConfig{
   FlushInterval: 250 * time.Millisecond,
   BatchSize:     1000,
 }
-collector := NewCollector("your_api_key", config)
+collector := NewCollector("your_secret_key", config)
 
 for i := 0; i < 100000; i ++ {
   collector.Collect("stream_name", map[string]string{
