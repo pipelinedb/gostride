@@ -90,6 +90,8 @@ stride.Delete("/analye/saved_query")
 
 #### `Subscribe(path string)`
 
+* `path` - url to subscribe to. Note that it is not necessary to append a `/subscribe` to the url.
+
 `Subscribe` is slightly different from the other methods, because it doesn't map directly to a traditional HTTP request type. `Subscribe`
 opens a long-lived HTTP connection and continuously receives events from the server (see [the API docs](https://www.stride.io/docs) for more
 information about `/subscribe` endpoints).
