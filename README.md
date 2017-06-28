@@ -115,3 +115,23 @@ subscription.Stop()
 Remember to close your `Subscription` connections with `Stop` when you're done with them, otherwise they'll accumulate on the server
 and will eventually prevent you from opening new ones.
 
+### Collector
+
+While you can certainly [collect](https://www.stride.io/docs#collect) events by using the `Post` method, you may not always want a blocking call such as `Post` in your application. For asynchronous, non-blocking event collection, `gostride` also provides you with the `Collector` class to save you the hassle of writing async boilerplate around `gostride's` `Post` method.
+
+```go
+config := &CollectorConfig{
+  FlushInterval: 250 * time.Millisecond,
+  BatchSize:     1000,
+}
+collector := NewCollector("your_api_key", config)
+
+for i := 0; i < 100000; i ++ {
+  collector.Collect("stream_name", map[string]string{
+    "key": "value",
+    "i": i,
+  })
+}
+
+collector.Close()
+```
