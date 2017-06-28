@@ -21,6 +21,7 @@ To use `gostride` in your Go project, create a new instance of the `Stride` type
 
 conf := NewConfig()
 stride := NewStride("your_api_key", conf)
+```
 
 `Stride` is a thin wrapper around [Stride's HTTP API](https://www.stride.io/docs), so there are only a few main methods
 to use: `Get`, `Post`, `Put`, `Delete`, and `Subscribe`. All methods except for `Subscribe` return an instance of `Response`,
@@ -30,7 +31,7 @@ which has three important members:
 * `Data` - JSON-encoded `interface{}` containing response data
 * `Error` - The `error` occurred during the request, if any
 
-### Get(path string)
+### `Get(path string)`
 
 * `path` - url to `GET` from
 
@@ -45,7 +46,7 @@ for _, s := range streams {
 }
 ```
 
-### Post(path string, data interface{})
+### `Post(path string, data interface{})`
 
 * `path` - url to `POST` data to
 * `data` - JSON-serialiable request body
@@ -63,7 +64,7 @@ proc := response.Data.(map[string]interface{})
 fmt.Println(proc["name"])
 ```
 
-### Put(path string, data interface{})
+### `Put(path string, data interface{})`
 
 * `path` - url to `PUT` data at
 * `data` - JSON-serialiable request body
@@ -76,7 +77,7 @@ stride.Put("/analyze/saved_query", map[string]interface{}{
 })
 ```
 
-### Delete(path string)
+### `Delete(path string)`
 
 * `path` - url to `DELETE` from
 
@@ -87,7 +88,7 @@ stride.Delete("/analye/saved_query")
 
 ```
 
-### Subscribe(path string)
+### `Subscribe(path string)`
 
 `Subscribe` is slightly different from the other methods, because it doesn't map directly to a traditional HTTP request type. `Subscribe`
 opens a long-lived HTTP connection and continuously receives events from the server (see [the API docs](https://www.stride.io/docs) for more
