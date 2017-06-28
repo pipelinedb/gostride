@@ -31,7 +31,8 @@ which has three important members:
 * `Data` - JSON-encoded `interface{}` containing response data
 * `Error` - The `error` occurred during the request, if any
 
-#### `Get(path string)`
+### Get()
+`Get(path string)`
 
 * `path` - url to `GET` from
 
@@ -46,7 +47,8 @@ for _, s := range streams {
 }
 ```
 
-#### `Post(path string, data interface{})`
+### Post()
+`Post(path string, data interface{})`
 
 * `path` - url to `POST` data to
 * `data` - JSON-serialiable request body
@@ -64,7 +66,8 @@ proc := response.Data.(map[string]interface{})
 fmt.Println(proc["name"])
 ```
 
-#### `Put(path string, data interface{})`
+### Put()
+`Put(path string, data interface{})`
 
 * `path` - url to `PUT` data at
 * `data` - JSON-serialiable request body
@@ -77,7 +80,8 @@ stride.Put("/analyze/saved_query", map[string]interface{}{
 })
 ```
 
-#### `Delete(path string)`
+### Delete()
+`Delete(path string)`
 
 * `path` - url to `DELETE` from
 
@@ -88,7 +92,8 @@ stride.Delete("/analye/saved_query")
 
 ```
 
-#### `Subscribe(path string)`
+### Subscribe()
+`Subscribe(path string)`
 
 * `path` - url to subscribe to. Note that it is not necessary to append a `/subscribe` to the url.
 
