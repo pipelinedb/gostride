@@ -88,7 +88,7 @@ stride.Put("/analyze/saved_query", map[string]interface{}{
 ```go
 
 // Delete a saved query
-stride.Delete("/analye/saved_query")
+stride.Delete("/analyze/saved_query")
 
 ```
 
