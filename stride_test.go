@@ -1,6 +1,7 @@
 package stride
 
 import (
+	"compress/gzip"
 	"io/ioutil"
 	"net/http"
 	"net/http/httptest"
@@ -28,6 +29,11 @@ func createMockServer(t *testing.T) *httptest.Server {
 				w.Write([]byte(`["stream0", "stream1"]`))
 			}
 		case http.MethodPost:
+			if r.Header.Get("Content-Encoding") == "gzip" {
+				gz, _ := gzip.NewReader(r.Body)
+				r.Body = gz
+				defer gz.Close()
+			}
 			w.WriteHeader(http.StatusCreated)
 			assert.NotNil(t, r.Body)
 			body, _ := ioutil.ReadAll(r.Body)
@@ -38,6 +44,24 @@ func createMockServer(t *testing.T) *httptest.Server {
 	}))
 
 	return server
+}
+
+func (suite *StrideTestSuite) TestCollectCompression() {
+	server := createMockServer(suite.T())
+	config := NewConfig()
+	config.Endpoint = server.URL + "/v1"
+
+	s := NewStride("key", config)
+	events := []map[string]string{
+		{"x": "x", "y": "y", "z": "z"},
+		{"x": "x", "y": "y", "z": "z"},
+		{"x": "x", "y": "y", "z": "z"},
+		{"x": "x", "y": "y", "z": "z"},
+	}
+	r := s.Post("/collect", events)
+
+	assert.Equal(suite.T(), http.StatusCreated, r.StatusCode)
+	assert.Equal(suite.T(), len(events), len(r.Data.([]interface{})))
 }
 
 func (suite *StrideTestSuite) TestPathValidation() {
@@ -60,6 +84,7 @@ func (suite *StrideTestSuite) TestPathValidation() {
 	assert.True(suite.T(), isPathValid(http.MethodGet, "/analyze/query/results"))
 	assert.True(suite.T(), isPathValid(http.MethodGet, "/analyze/query/results"))
 	assert.True(suite.T(), isPathValid(http.MethodPut, "/analyze/query"))
+	assert.True(suite.T(), isPathValid(http.MethodPut, "/process/proc"))
 
 	assert.False(suite.T(), isPathValid(http.MethodGet, "/collect/_stream"))
 	assert.False(suite.T(), isPathValid(http.MethodGet, "/collect/1stream"))
@@ -67,7 +92,6 @@ func (suite *StrideTestSuite) TestPathValidation() {
 	assert.False(suite.T(), isPathValid(http.MethodPost, "/process"))
 	assert.False(suite.T(), isPathValid("Subscribe", "/analyze/query"))
 	assert.False(suite.T(), isPathValid(http.MethodPut, "/collect/stream"))
-	assert.False(suite.T(), isPathValid(http.MethodPut, "/process/proc"))
 	assert.False(suite.T(), isPathValid(http.MethodPut, "/collect"))
 	assert.False(suite.T(), isPathValid(http.MethodPut, "/process"))
 	assert.False(suite.T(), isPathValid(http.MethodPut, "/analyze"))

@@ -2,6 +2,7 @@ package stride
 
 import (
 	"bytes"
+	"compress/gzip"
 	"encoding/json"
 	"errors"
 	"fmt"
@@ -50,6 +51,7 @@ var (
 	ErrInvalidAPIKey = errors.New("Invalid API key")
 )
 
+var collectPath = regexp.MustCompile(`^/collect`)
 var validPaths = map[string][]*regexp.Regexp{
 	http.MethodGet: {
 		regexp.MustCompile(`^/(collect|process)(/[A-Za-z][A-Za-z0-9_]*)?$`),
@@ -151,6 +153,21 @@ func NewStride(apiKey string, config *Config) *Stride {
 	}
 }
 
+func compressBody(body []byte) ([]byte, error) {
+	var bb bytes.Buffer
+	gz := gzip.NewWriter(&bb)
+	if _, err := gz.Write(body); err != nil {
+		return nil, err
+	}
+	if err := gz.Flush(); err != nil {
+		return nil, err
+	}
+	if err := gz.Close(); err != nil {
+		return nil, err
+	}
+	return bb.Bytes(), nil
+}
+
 func (s *Stride) makeRequest(method, path string, data interface{}) *Response {
 	if !isPathValid(method, path) {
 		return &Response{
@@ -170,6 +187,7 @@ func (s *Stride) makeRequest(method, path string, data interface{}) *Response {
 	url := s.config.Endpoint + path
 	var reader io.Reader
 	var body []byte
+	var compressed bool
 	if data != nil {
 		b, err := json.Marshal(data)
 		if err != nil {
@@ -180,11 +198,27 @@ func (s *Stride) makeRequest(method, path string, data interface{}) *Response {
 				ErrInvalidBody,
 			}
 		}
+		// Compress events written to /collect
+		if collectPath.Match([]byte(path)) {
+			b, err = compressBody(b)
+			if err != nil {
+				lg.WithError(err).Error("Failed to compress request body")
+				return &Response{
+					-1,
+					nil,
+					err,
+				}
+			}
+			compressed = true
+		}
 		body = b
 		reader = bytes.NewReader(b)
 	}
 
 	req, _ := http.NewRequest(method, url, reader)
+	if compressed {
+		req.Header.Add("Content-Encoding", "gzip")
+	}
 	req.Header.Add("User-Agent", fmt.Sprintf("gostride (version: %s)", Version))
 	req.Header.Add("Accept", "application/json")
 	req.Header.Add("Content-Type", "application/json")

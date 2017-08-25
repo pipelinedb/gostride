@@ -1,6 +1,7 @@
 package stride
 
 import (
+	"compress/gzip"
 	"encoding/json"
 	"fmt"
 	"io/ioutil"
@@ -26,6 +27,9 @@ func createMockCollectServer() (*httptest.Server, chan mockRequest) {
 	rchan := make(chan mockRequest, 1)
 
 	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		gz, _ := gzip.NewReader(r.Body)
+		r.Body = gz
+		defer gz.Close()
 		body, _ := ioutil.ReadAll(r.Body)
 
 		var v map[string]interface{}

@@ -111,9 +111,15 @@ func (c *Collector) makeRequest(events map[string][]map[string]interface{}) erro
 		return ErrInvalidBody
 	}
 
+	b, err = compressBody(b)
+	if err != nil {
+		lg.WithError(err).Error("Failed to compress request body")
+	}
+
 	url := c.config.Endpoint + "/collect"
 	req, _ := http.NewRequest("POST", url, bytes.NewReader(b))
 
+	req.Header.Add("Content-Encoding", "gzip")
 	req.Header.Add("User-Agent", fmt.Sprintf("gostride (version: %s)", Version))
 	req.Header.Add("Accept", "application/json")
 	req.Header.Add("Content-Type", "application/json")
